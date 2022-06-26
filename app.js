@@ -6,6 +6,7 @@ var multer = require('multer');
 const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );
 const $ = require( "jquery" )( window );
+
 app.use(bodyParser.json({extended: true}));
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -27,23 +28,25 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({storage:storage});
- 
+
 app.post('/community/board/image', upload.array('photo',3), (req, res) => {
     console.log(req.files);
 });
 
 app.post('/user/join', function (req, res) {
-    var User_name = req.body.User_name;
-    var User_birth = req.body.User_birth;
-    var User_id = req.body.User_id;
-    var User_pwd = req.body.User_pwd;
-    var User_gender= req.body.User_gender;
-    var User_nickname= req.body.User_nickname;
-    var User_phone= req.body.User_phone;
-    var User_height= req.body.User_height;
-    var User_weight= req.body.User_weight;
-    var sql = 'INSERT INTO User_table (User_name, User_birth, User_id, User_pwd, User_gender, User_nickname, User_phone, User_height, User_weight ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    var params = [User_name, User_birth, User_id, User_pwd, User_gender, User_nickname, User_phone, User_height, User_weight];
+    var user_name = req.body.user_name;
+    var user_birth = req.body.user_birth;
+    var user_id = req.body.user_id;
+    var user_pwd = req.body.user_pwd;
+    var user_gender= req.body.user_gender;
+    var user_nickname= req.body.user_nickname;
+    var user_phone= req.body.user_phone;
+    var user_height= req.body.user_height;
+    var user_weight= req.body.user_weight;
+
+    var sql = 'INSERT INTO user_table (user_name, user_birth, user_id, user_pwd, user_gender, user_nickname, user_phone, user_height, user_weight ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    var params = [user_name, user_birth, user_id, user_pwd, user_gender, user_nickname, user_phone, user_height, user_weight];
+
     connection.query(sql, params, function (err, result) {
         if (err)
             console.log(err);
@@ -56,9 +59,11 @@ app.post('/user/join', function (req, res) {
 });
 
 app.post('/user/join/checkId', function (req, res) {
-    var User_id = req.body.User_id;
-    var sql = 'select * from User_table where User_id = ?';
-    connection.query(sql, User_id, function (err, result) {
+    var user_id = req.body.user_id;
+
+    var sql = 'select * from user_table where user_id = ?';
+
+    connection.query(sql, user_id, function (err, result) {
         if (err)
             console.log(err);
         else {
@@ -69,7 +74,7 @@ app.post('/user/join/checkId', function (req, res) {
                 });
             } else {
                 res.json({
-                        result: false,
+                    result: false,
                     message: '중복된 아이디가 존재합니다'
                 });
             }
@@ -78,9 +83,11 @@ app.post('/user/join/checkId', function (req, res) {
 });
 
 app.post('/user/join/checkNickname', function (req, res) {
-    var User_nickname = req.body.User_nickname;
-    var sql = 'select * from User_table where User_nickname = ?';
-    connection.query(sql, User_nickname, function (err, result) {
+    var user_nickname = req.body.user_nickname;
+
+    var sql = 'select * from user_table where user_nickname = ?';
+
+    connection.query(sql, user_nickname, function (err, result) {
         if (err)
             console.log(err);
         else {
@@ -91,7 +98,7 @@ app.post('/user/join/checkNickname', function (req, res) {
                 });
             } else {
                 res.json({
-                        result: false,
+                    result: false,
                     message: '중복된 닉네임이 존재합니다'
                 });
             }
@@ -100,10 +107,12 @@ app.post('/user/join/checkNickname', function (req, res) {
 });
 
 app.post('/user/login', function (req, res) {
-    var User_id = req.body.User_id;
-    var User_pwd = req.body.User_pwd;
-    var sql = 'select * from User_table where User_id = ? AND User_pwd = ?';
-    var params = [User_id, User_pwd];
+    var user_id = req.body.user_id;
+    var user_pwd = req.body.user_pwd;
+
+    var sql = 'select * from user_table where user_id = ? AND user_pwd = ?';
+    var params = [user_id, user_pwd];
+
     connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
@@ -113,7 +122,7 @@ app.post('/user/login', function (req, res) {
                     result: false,
                     message: '존재하지 않는 계정입니다!'
                 });
-            } else if (User_pwd !== result[0].User_pwd) {
+            } else if (user_pwd !== result[0].user_pwd) {
                 res.json({
                     result: false,
                     message: '비밀번호가 틀렸습니다!'
@@ -122,16 +131,16 @@ app.post('/user/login', function (req, res) {
                 res.json({
                     result: true,
                     message: '로그인 성공!',
-                    User_id: User_id,
-                    User_name: result[0].User_name,
-                    User_birth: result[0].User_birth,
-                    User_gender: result[0].User_gender,
-                    User_nickname: result[0].User_nickname,
-                    User_phone: result[0].User_phone,
-                    User_height: result[0].User_height,
-                    User_weight: result[0].User_weight,
-                    User_strength: result[0].User_strength,
-                    User_goal: result[0].User_goal
+                    user_id: user_id,
+                    user_name: result[0].user_name,
+                    user_birth: result[0].user_birth,
+                    user_gender: result[0].user_gender,
+                    user_nickname: result[0].user_nickname,
+                    user_phone: result[0].user_phone,
+                    user_height: result[0].user_height,
+                    user_weight: result[0].user_weight,
+                    user_strength: result[0].user_strength,
+                    user_goal: result[0].user_goal
                 });
             }
         }
@@ -139,15 +148,16 @@ app.post('/user/login', function (req, res) {
 });
 
 app.post('/community/write/', function (req, res) {
-    var Board_date = req.body.Board_date;
-    var User_id = req.body.User_id;
-    var User_nickname = req.body.User_nickname;
-    var Board_title = req.body.Board_title;
-    var Board_context = req.body.Board_context;
-    var Board_countcomment = req.body.Board_countcomment;
+    var board_date = req.body.board_date;
+    var user_id = req.body.user_id;
+    var user_nickname = req.body.user_nickname;
+    var board_title = req.body.board_title;
+    var board_context = req.body.board_context;
+    var board_countcomment = req.body.board_countcomment;
     var Img_num = req.body.Img_num;
-    var sql = 'INSERT INTO Board (User_nickname, User_id, Board_date, Board_title, Board_context, Board_countcomment, Img_num ) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    var params = [User_nickname, User_id, Board_date, Board_title, Board_context, Board_countcomment, Img_num];
+
+    var sql = 'INSERT INTO Board (user_nickname, user_id, board_date, board_title, board_context, board_countcomment, Img_num ) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    var params = [user_nickname, user_id, board_date, board_title, board_context, board_countcomment, Img_num];
 
     connection.query(sql, params, function (err, result) {
         if (err) {
@@ -167,13 +177,14 @@ app.post('/community/write/', function (req, res) {
 });
 
 app.post('/community/write/comment', function (req, res) {
-    var Board_number = req.body.Board_number;
-    var Comment_date = req.body.Comments_date;
-    var User_id = req.body.User_id;
-    var User_nickname = req.body.User_nickname;
-    var Comment_context = req.body.Comments_context;
-    var sql = 'INSERT INTO Comments ( User_nickname, User_id, Board_number, Comments_date, Comments_context ) VALUES (?, ?, ?, ?, ?)';
-    var params = [User_nickname, User_id, Board_number, Comment_date, Comment_context];
+    var board_number = req.body.board_number;
+    var comment_date = req.body.comments_date;
+    var user_id = req.body.user_id;
+    var user_nickname = req.body.user_nickname;
+    var comment_context = req.body.comments_context;
+
+    var sql = 'INSERT INTO comments ( user_nickname, user_id, board_number, comments_date, comments_context ) VALUES (?, ?, ?, ?, ?)';
+    var params = [user_nickname, user_id, board_number, comment_date, comment_context];
 
     connection.query(sql, params, function (err, result) {
         if (err) {
@@ -193,9 +204,11 @@ app.post('/community/write/comment', function (req, res) {
 });
 
 app.post('/community/load', function (req, res) {
-var sql = 'select * from Board';
     var response = new Array();
     var a = new Object();
+
+    var sql = 'select * from Board';
+
     connection.query(sql, function (err,result) {
         if (err)
             console.log(err);
@@ -205,18 +218,20 @@ var sql = 'select * from Board';
                     result: false,
                     message: '게시글이 존재하지 않습니다'
                 });
-            } else {for ( i = result.length - 1 ; i > -1 ; i--) {
-                a.User_id= result[i].User_id;
-                a.User_nickname= result[i].User_nickname;
-                a.Board_number= result[i].Board_number;
-                a.Board_title= result[i].Board_title;
-                a.Board_context= result[i].Board_context;
-                a.Board_date= result[i].Board_date;
-                a.Board_count= result[i].Board_count;
-                a.Board_countcomment= result[i].Board_countcomment;
-                a.Img_num= result[i].Img_num;
+            } else {for (i = result.length - 1 ; i > -1 ; i--) {
+                a = new Object();
+
+                a.user_id = result[i].user_id;
+                a.user_nickname = result[i].user_nickname;
+                a.board_number = result[i].board_number;
+                a.board_title = result[i].board_title;
+                a.board_context = result[i].board_context;
+                a.board_date = result[i].board_date;
+                a.board_count = result[i].board_count;
+                a.board_countcomment = result[i].board_countcomment;
+                a.Img_num = result[i].Img_num;
+
                 response.push(a);
-                a=new Object();
                 }
                     res.json({
                     result: true,
@@ -230,11 +245,13 @@ var sql = 'select * from Board';
 });
 
 app.post('/community/load/comment', function (req, res) {
-    var Board_number = req.body.Board_number;
-    var sql = 'select * from Comments where Board_number = ?';
+    var board_number = req.body.board_number;
     var response = new Array();
     var a = new Object();
-    var params = [Board_number];
+
+    var sql = 'select * from comments where board_number = ?';
+    var params = [board_number];
+
     connection.query(sql,params, function (err,result) {
         if (err)
             console.log(err);
@@ -245,15 +262,17 @@ app.post('/community/load/comment', function (req, res) {
                     message: '댓글이 존재하지않습니다.'
                 });
             } else {for ( i = 0 ; i < result.length ; i++) {
-                a.User_id= result[i].User_id;
-                a.User_nickname= result[i].User_nickname;
-                a.Comments_number= result[i].Comments_number;
-                a.Board_number= result[i].Board_number;
-                a.Comments_context= result[i].Comments_context;
-                a.Comments_date= result[i].Comments_date;
-                a.Comments_parentnumber= result[i].Comments_parentnumber;
+                a = new Object();
+
+                a.user_id = result[i].user_id;
+                a.user_nickname = result[i].user_nickname;
+                a.comments_number = result[i].comments_number;
+                a.board_number = result[i].board_number;
+                a.comments_context = result[i].comments_context;
+                a.comments_date = result[i].comments_date;
+                a.comments_parentnumber = result[i].comments_parentnumber;
+
                 response.push(a);
-                a=new Object();
                 }
                     res.json({
                     result: true,
@@ -266,15 +285,17 @@ app.post('/community/load/comment', function (req, res) {
 });
 
 app.post('/user/calendar/routine', function (req, res) {
-    var User_id = req.body.User_id;
-    var Calendar_date = req.body.Calendar_date;
-    var Calendar_title = req.body.Calendar_title;
-    var Calendar_count = req.body.Calendar_count;
-    var Calendar_minute = req.body.Calendar_minute;
-    var Calendar_second = req.body.Calendar_second;
-    var Calendar_memo = req.body.Calendar_memo;
-    var sql = 'insert into Calendar (User_id, Calendar_date, Calendar_title, Calendar_count, Calendar_minute, Calendar_second, Calendar_memo) values(?, ?, ?, ?, ?)';
-    var params = [User_id, Calendar_date, Calendar_title, Calendar_count, Calendar_minute, Calendar_second, Calendar_memo];
+    var user_id = req.body.user_id;
+    var calendar_date = req.body.calendar_date;
+    var calendar_title = req.body.calendar_title;
+    var calendar_count = req.body.calendar_count;
+    var calendar_minute = req.body.calendar_minute;
+    var calendar_second = req.body.calendar_second;
+    var calendar_memo = req.body.calendar_memo;
+
+    var sql = 'insert into Calendar (user_id, calendar_date, calendar_title, calendar_count, calendar_minute, calendar_second, calendar_memo) values(?, ?, ?, ?, ?)';
+    var params = [user_id, calendar_date, calendar_title, calendar_count, calendar_minute, calendar_second, calendar_memo];
+
     connection.query(sql, params, function (err,result) {
         if (err){
             res.json({
@@ -293,7 +314,7 @@ app.post('/user/calendar/routine', function (req, res) {
     })
     const spawn = require('child_process').spawn;
 
-    const result = spawn('python', ['exercise.py',User_id,Calendar_title,Calendar_count, Calendar_minute, Calendar_second]);
+    const result = spawn('python', ['exercise.py', user_id, calendar_title, calendar_count, calendar_minute, calendar_second]);
 
     result.stdout.on('data', function(data) {
         console.log(data.toString());
@@ -305,15 +326,17 @@ app.post('/user/calendar/routine', function (req, res) {
 });
 
 app.post('/user/calendar', function (req, res) {
-    var User_id = req.body.User_id;
-    var Calendar_date = req.body.Calendar_date;
-    var Calendar_title = req.body.Calendar_title;
-    var Calendar_count = req.body.Calendar_count;
-    var Calendar_minute = req.body.Calendar_min;
-    var Calendar_second = req.body.Calendar_sec;
-    var Calendar_memo = req.body.Calendar_memo;
-    var sql = 'insert into Calendar (User_id, Calendar_date, Calendar_title, Calendar_count, Calendar_minute, Calendar_second, Calendar_memo) values(?, ?, ?, ?, ?, ?, ?)';
-    var params = [User_id, Calendar_date, Calendar_title, Calendar_count, Calendar_minute, Calendar_second, Calendar_memo];
+    var user_id = req.body.user_id;
+    var calendar_date = req.body.calendar_date;
+    var calendar_title = req.body.calendar_title;
+    var calendar_count = req.body.calendar_count;
+    var calendar_minute = req.body.calendar_min;
+    var calendar_second = req.body.calendar_sec;
+    var calendar_memo = req.body.calendar_memo;
+
+    var sql = 'insert into Calendar (user_id, calendar_date, calendar_title, calendar_count, calendar_minute, calendar_second, calendar_memo) values(?, ?, ?, ?, ?, ?, ?)';
+    var params = [user_id, calendar_date, calendar_title, calendar_count, calendar_minute, calendar_second, calendar_memo];
+
     connection.query(sql, params, function (err,result) {
         if (err){
             res.json({
@@ -331,7 +354,7 @@ app.post('/user/calendar', function (req, res) {
     })
     const spawn = require('child_process').spawn;
 
-    const result = spawn('python', ['exercise.py',User_id,Calendar_title,Calendar_count, Calendar_minute, Calendar_second]);
+    const result = spawn('python', ['exercise.py', user_id, calendar_title, calendar_count, calendar_minute, calendar_second]);
 
     result.stdout.on('data', function(data) {
         console.log(data.toString());
@@ -343,11 +366,13 @@ app.post('/user/calendar', function (req, res) {
 });
 
 app.post('/user/calendar/date', function (req, res) {
-    var User_id = req.body.User_id;
-    var sql = 'select Calendar_date from Calendar where User_id = ?';
     var response = new Array();
     var a = new Object();
-    var params = [User_id];
+    var user_id = req.body.user_id;
+
+    var sql = 'select calendar_date from Calendar where user_id = ?';
+    var params = [user_id];
+
     connection.query(sql,params, function (err,result) {
         if (err)
             console.log(err);
@@ -358,7 +383,7 @@ app.post('/user/calendar/date', function (req, res) {
                     message: '운동한 날이 없습니다.'
                 });
             } else {for ( i = 0 ; i < result.length ; i++) {
-                a.Calendar_date= result[i].Calendar_date;
+                a.calendar_date = result[i].calendar_date;
                 response.push(a);
                 a=new Object();
                 }
@@ -373,13 +398,15 @@ app.post('/user/calendar/date', function (req, res) {
 });
 
 app.post('/user/calendar/data', function (req, res) {
-    var User_id = req.body.User_id;
-    var Calendar_date = req.body.Calendar_date;
-    var sql = 'select id, Calendar_date,Calendar_title,Calendar_count,Calendar_memo,Calendar_minute,Calendar_second from Calendar where User_id = ? AND Calendar_date = ?';
+    var user_id = req.body.user_id;
+    var calendar_date = req.body.calendar_date;
     var response = new Array();
     var a = new Object();
-    var params = [User_id, Calendar_date];
-    connection.query(sql,params, function (err,result) {
+
+    var sql = 'select id, calendar_date,calendar_title,calendar_count,calendar_memo,calendar_minute,calendar_second from Calendar where user_id = ? AND calendar_date = ?';
+    var params = [user_id, calendar_date];
+
+    connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
         else {
@@ -390,13 +417,13 @@ app.post('/user/calendar/data', function (req, res) {
                 });
             } else {for ( i = 0 ; i < result.length ; i++) {
                 a = new Object();
-                a.id= result[i].id;
-                a.Calendar_date= result[i].Calendar_date;
-                a.Calendar_title= result[i].Calendar_title;
-                a.Calendar_count= result[i].Calendar_count;
-                a.Calendar_memo= result[i].Calendar_memo;
-                a.Calendar_min= result[i].Calendar_minute;
-                a.Calendar_sec= result[i].Calendar_second;
+                a.id = result[i].id;
+                a.calendar_date = result[i].calendar_date;
+                a.calendar_title = result[i].calendar_title;
+                a.calendar_count = result[i].calendar_count;
+                a.calendar_memo = result[i].calendar_memo;
+                a.calendar_min = result[i].calendar_minute;
+                a.calendar_sec = result[i].calendar_second;
                 response.push(a);
                 }
                     res.json({
@@ -410,15 +437,12 @@ app.post('/user/calendar/data', function (req, res) {
 });
 
 app.post('/community/board/del', function (req, res) {
-    var Board_number = req.body.Board_number;
-    var sql = 'delete from Board where Board_number = ?';
-    var sql2 = 'delete from Comments where Board_number = ?';
-    var params = [Board_number];
+    var board_number = req.body.board_number;
+
+    var sql = 'delete from Board where board_number = ?; delete from comments where board_number = ?;';
+    var params = [board_number, board_number];
+
     connection.query(sql, params, function (err,result) {
-        if (err)
-            console.log(err);
-    })
-    connection.query(sql2, params, function (err,result) {
         if (err)
             console.log(err);
         else{
@@ -432,8 +456,10 @@ app.post('/community/board/del', function (req, res) {
 
 app.post('/user/calendar/deletefit', function (req, res) {
     var id = req.body.id;
+
     var sql = 'delete from Calendar where id = ?';
     var params = [id];
+
     connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
@@ -448,13 +474,15 @@ app.post('/user/calendar/deletefit', function (req, res) {
 
 app.post('/user/calendar/modifyfit', function (req, res) {
     var id = req.body.id;
-    var Calendar_title = req.body.Calendar_title;
-    var Calendar_count = req.body.Calendar_count;
-    var Calendar_memo = req.body.Calendar_memo;
-    var Calendar_min = req.body.Calendar_min;
-    var Calendar_sec = req.body.Calendar_sec;
-    var sql = 'update Calendar set Calendar_title=?, Calendar_count=?, Calendar_memo=?, Calendar_minute=?, Calendar_second=? where id = ?';
-    var params = [Calendar_title,Calendar_count,Calendar_memo,Calendar_min,Calendar_sec,id];
+    var calendar_title = req.body.calendar_title;
+    var calendar_count = req.body.calendar_count;
+    var calendar_memo = req.body.calendar_memo;
+    var calendar_min = req.body.calendar_min;
+    var calendar_sec = req.body.calendar_sec;
+
+    var sql = 'UPDATE Calendar SET calendar_title=?, calendar_count=?, calendar_memo=?, calendar_minute=?, calendar_second=? where id = ?';
+    var params = [calendar_title,calendar_count,calendar_memo,calendar_min,calendar_sec,id];
+
     connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
@@ -468,9 +496,11 @@ app.post('/user/calendar/modifyfit', function (req, res) {
 });
 
 app.post('/community/comment/del', function (req, res) {
-    var Comments_number = req.body.Comments_number;
-    var sql = 'delete from Comments where Comments_number = ?';
-    var params = [Comments_number];
+    var comments_number = req.body.comments_number;
+
+    var sql = 'delete from comments where comments_number = ?';
+    var params = [comments_number];
+
     connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
@@ -484,11 +514,13 @@ app.post('/community/comment/del', function (req, res) {
 });
 
 app.post('/community/comment/modify', function (req, res) {
-    var Comments_number = req.body.Comments_number;
-    var Comments_context = req.body.Comments_context;
-    var Comments_date = req.body.Comments_date;
-    var sql = 'update Comments set Comments_context=?, Comments_date=? where Comments_number = ?';
-    var params = [Comments_context,Comments_date,Comments_number];
+    var comments_number = req.body.comments_number;
+    var comments_context = req.body.comments_context;
+    var comments_date = req.body.comments_date;
+
+    var sql = 'UPDATE comments SET comments_context=?, comments_date=? where comments_number = ?';
+    var params = [comments_context,comments_date,comments_number];
+
     connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
@@ -502,12 +534,14 @@ app.post('/community/comment/modify', function (req, res) {
 });
 
 app.post('/community/board/Modify', function (req, res) {
-    var Board_number = req.body.Board_number;
-    var Board_title = req.body.Board_title;
-    var Board_context = req.body.Board_context;
-    var Board_date = req.body.Board_date;
-    var sql = 'update Board set Board_title=?, Board_context=?, Board_date=? where Board_number = ?';
-    var params = [Board_title,Board_context,Board_date,Board_number];
+    var board_number = req.body.board_number;
+    var board_title = req.body.board_title;
+    var board_context = req.body.board_context;
+    var board_date = req.body.board_date;
+
+    var sql = 'UPDATE Board SET board_title=?, board_context=?, board_date=? where board_number = ?';
+    var params = [board_title,board_context,board_date,board_number];
+
     connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
@@ -521,7 +555,7 @@ app.post('/community/board/Modify', function (req, res) {
 });
 
 app.post('/user/part_preference', function (req, res) {
-    var User_id = req.body.User_id;
+    var user_id = req.body.user_id;
     var Part_shoulder = req.body.Part_shoulder;
     var Part_arm = req.body.Part_arm;
     var Part_Chest = req.body.Part_Chest;
@@ -531,8 +565,10 @@ app.post('/user/part_preference', function (req, res) {
     var Part_Hip = req.body.Part_Hip;
     var Part_thigh = req.body.Part_thigh;
     var Part_Wholebody = req.body.Part_Wholebody;
-    var sql = 'update User_routine set User_어깨=?, User_팔=?, User_가슴=?, User_등=?, User_복부=?, User_코어=?, User_엉덩이=?, User_허벅지=?, User_전신=? where User_id = ?';
-    var params = [Part_shoulder,Part_arm,Part_Chest,Part_back,Part_abdominal,Part_core,Part_Hip,Part_thigh,Part_Wholebody,User_id];
+
+    var sql = 'UPDATE user_routine SET user_어깨=?, user_팔=?, user_가슴=?, user_등=?, user_복부=?, user_코어=?, user_엉덩이=?, user_허벅지=?, user_전신=? where user_id = ?';
+    var params = [Part_shoulder,Part_arm,Part_Chest,Part_back,Part_abdominal,Part_core,Part_Hip,Part_thigh,Part_Wholebody,user_id];
+
     connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
@@ -546,66 +582,66 @@ app.post('/user/part_preference', function (req, res) {
 });
 
 app.post('/routine/Recommend', function (req, res) {
-    var User_id = req.body.User_id;
+    var user_id = req.body.user_id;
     var a;
     var b;
     var c;
     var response = new Array();
     var aa = new Object();
-    var params = [User_id];
-    var sql = 'select User_어깨, User_팔, User_가슴, User_등, User_복부, User_코어, User_엉덩이, User_허벅지, User_전신 from User_routine where User_id = ?';
-    var sql1 = 'Select name from Exercise where ? = 2'
+    var params = [user_id];
+    var sql = 'select user_어깨, user_팔, user_가슴, user_등, user_복부, user_코어, user_엉덩이, user_허벅지, user_전신 from user_routine where user_id = ?';
+    var sql1 = 'Select name from exercise where ? = 2'
     connection.query(sql,params, function (err,result) {
         if (err)
             console.log(err);
         else {
-            if(result[0].User_어깨 < result[0].User_팔) {
-                a = result[0].User_팔;
+            if(result[0].user_어깨 < result[0].user_팔) {
+                a = result[0].user_팔;
                 b=1;
             }
             else{
-                a = result[0].User_어깨;
+                a = result[0].user_어깨;
                 b=0;
             }
-            if(a < result[0].User_가슴) {
-                a = result[0].User_가슴;
+            if(a < result[0].user_가슴) {
+                a = result[0].user_가슴;
                 b=2;
             }
-            if(a < result[0].User_등) {
-                a = result[0].User_등;
+            if(a < result[0].user_등) {
+                a = result[0].user_등;
                 b=3;
             }
-            if(a < result[0].User_복부) {
-                a = result[0].User_복부;
+            if(a < result[0].user_복부) {
+                a = result[0].user_복부;
                 b=4;
             }
-            if(a < result[0].User_코어) {
-                a = result[0].User_코어;
+            if(a < result[0].user_코어) {
+                a = result[0].user_코어;
                 b=5;
             }
-            if(a < result[0].User_엉덩이) {
-                a = result[0].User_엉덩이;
+            if(a < result[0].user_엉덩이) {
+                a = result[0].user_엉덩이;
                 b=6;
             }
-            if(a < result[0].User_허벅지) {
-                a = result[0].User_허벅지;
+            if(a < result[0].user_허벅지) {
+                a = result[0].user_허벅지;
                 b=7;
             }
-            if(a < result[0].User_전신) {
-                a = result[0].User_전신;
+            if(a < result[0].user_전신) {
+                a = result[0].user_전신;
                 b=8;
             }
         }
 
-        if(b===0)sql1 = 'Select name from Exercise where 어깨 = 2 OR 어깨 = 1';
-        if(b===1)sql1 = 'Select name from Exercise where 팔 = 2 OR 팔 = 1';
-        if(b===2)sql1 = 'Select name from Exercise where 가슴 = 2 OR 가슴 = 1';
-        if(b===3)sql1 = 'Select name from Exercise where 등 = 2 OR 등 = 1';
-        if(b===4)sql1 = 'Select name from Exercise where 복부 = 2 OR 복부 = 1';
-        if(b===5)sql1 = 'Select name from Exercise where 코어 = 2 OR 코어 = 1';
-        if(b===6)sql1 = 'Select name from Exercise where 엉덩이 = 2 OR 엉덩이 = 1';
-        if(b===7)sql1 = 'Select name from Exercise where 허벅지 = 2 OR 허벅지 = 1';
-        if(b===8)sql1 = 'Select name from Exercise where 전신 = 2 OR 전신 = 1';
+        if(b===0)sql1 = 'Select name from exercise where 어깨 = 2 OR 어깨 = 1';
+        if(b===1)sql1 = 'Select name from exercise where 팔 = 2 OR 팔 = 1';
+        if(b===2)sql1 = 'Select name from exercise where 가슴 = 2 OR 가슴 = 1';
+        if(b===3)sql1 = 'Select name from exercise where 등 = 2 OR 등 = 1';
+        if(b===4)sql1 = 'Select name from exercise where 복부 = 2 OR 복부 = 1';
+        if(b===5)sql1 = 'Select name from exercise where 코어 = 2 OR 코어 = 1';
+        if(b===6)sql1 = 'Select name from exercise where 엉덩이 = 2 OR 엉덩이 = 1';
+        if(b===7)sql1 = 'Select name from exercise where 허벅지 = 2 OR 허벅지 = 1';
+        if(b===8)sql1 = 'Select name from exercise where 전신 = 2 OR 전신 = 1';
         connection.query(sql1, function (err,result){
             if (err)
             console.log(err);
@@ -643,7 +679,7 @@ app.post('/routine/Recommend', function (req, res) {
 app.post('/user/exercise_form_preference', function (req, res) {
     var response = new Array();
     var a = new Object();
-    var sql = 'select name from Exercise ';
+    var sql = 'select name from exercise ';
     connection.query(sql, function (err,result) {
         if (err)
             console.log(err);
@@ -655,7 +691,7 @@ app.post('/user/exercise_form_preference', function (req, res) {
                 });
             } else {for ( i = 0 ; i < result.length ; i++) {
                     a = new Object();
-                    a.Exercise_title= result[i].name;
+                    a.exercise_title= result[i].name;
                     response.push(a);
                 }
                 res.json({
@@ -670,17 +706,17 @@ app.post('/user/exercise_form_preference', function (req, res) {
 
 app.post('/user/exercise_preference', function (req, res) {
     var id = new Array();
-    var User_id = req.body.User_id;
+    var user_id = req.body.user_id;
     var t;
     var x;
-    var sql = 'select id from User_table where User_id = ?';
-    var params = [User_id];
+    var sql = 'select id from user_table where user_id = ?';
+    var params = [user_id];
 
     function go_py(prm) {
         const spawn = require('child_process').spawn;
         const result = spawn('python', ['algorithm.py']);
         let data = {
-            User_id: prm,
+            user_id: prm,
             id
         };
         console.log('data')
@@ -696,14 +732,14 @@ app.post('/user/exercise_preference', function (req, res) {
 
         result.stdin.end();
     }
-    
-    for(i=0;i<req.body.Exercise_name.length;i++){
-        if(req.body.Exercise_name[i]===6){
+
+    for(i=0;i<req.body.exercise_name.length;i++){
+        if(req.body.exercise_name[i]===6){
             x=String(i+1);
             id.push(x)
         }
     }
-    connection.query(sql,params, function (err,result) {
+    connection.query(sql, params, function (err,result) {
         if (err)
             console.log(err);
         else {
@@ -714,14 +750,14 @@ app.post('/user/exercise_preference', function (req, res) {
                 result: true,
                 message:'완료'
             });
-        }    
+        }
     })
 });
 
-app.post('/user/routine/loadexcerciseinfo', function (req, res) {
+app.post('/user/routine/loadexerciseinfo', function (req, res) {
     var response = new Array();
     var a = new Object();
-    var sql = 'select * from Exercise';
+    var sql = 'select * from exercise';
     connection.query(sql, function (err,result) {
         if (err)
             console.log(err);
@@ -733,8 +769,8 @@ app.post('/user/routine/loadexcerciseinfo', function (req, res) {
                 });
             } else {for ( i = 0 ; i < result.length ; i++) {
                     a = new Object();
-                    a.Exercise_title= result[i].name;
-                    a.Excerise_Data =[result[i].어깨,result[i].팔,result[i].가슴,result[i].등,result[i].복부,result[i].코어,result[i].엉덩이,result[i].허벅지,result[i].전신];
+                    a.exercise_title= result[i].name;
+                    a.exercise_Data =[result[i].어깨,result[i].팔,result[i].가슴,result[i].등,result[i].복부,result[i].코어,result[i].엉덩이,result[i].허벅지,result[i].전신];
                     response.push(a);
                 }
                 res.json({
@@ -750,47 +786,47 @@ app.post('/user/routine/loadexcerciseinfo', function (req, res) {
 app.post('/user/routine/RecommendExericse', function (req, res) {
     var a;
     var b;
-    var User_id = req.body.User_id;
-    var params = [User_id];
-    var sql = 'select User_어깨, User_팔, User_가슴, User_등, User_복부, User_코어, User_엉덩이, User_허벅지, User_전신 from User_routine where User_id = ?';
+    var user_id = req.body.user_id;
+    var params = [user_id];
+    var sql = 'select user_어깨, user_팔, user_가슴, user_등, user_복부, user_코어, user_엉덩이, user_허벅지, user_전신 from user_routine where user_id = ?';
     connection.query(sql,params, function (err,result) {
         if (err)
             console.log(err);
         else {
-            if(result[0].User_어깨 < result[0].User_팔) {
-                a = result[0].User_팔;
+            if(result[0].user_어깨 < result[0].user_팔) {
+                a = result[0].user_팔;
                 b=1;
             }
             else{
-                a = result[0].User_어깨;
+                a = result[0].user_어깨;
                 b=0;
             }
-            if(a < result[0].User_가슴) {
-                a = result[0].User_가슴;
+            if(a < result[0].user_가슴) {
+                a = result[0].user_가슴;
                 b=2;
             }
-            if(a < result[0].User_등) {
-                a = result[0].User_등;
+            if(a < result[0].user_등) {
+                a = result[0].user_등;
                 b=3;
             }
-            if(a < result[0].User_복부) {
-                a = result[0].User_복부;
+            if(a < result[0].user_복부) {
+                a = result[0].user_복부;
                 b=4;
             }
-            if(a < result[0].User_코어) {
-                a = result[0].User_코어;
+            if(a < result[0].user_코어) {
+                a = result[0].user_코어;
                 b=5;
             }
-            if(a < result[0].User_엉덩이) {
-                a = result[0].User_엉덩이;
+            if(a < result[0].user_엉덩이) {
+                a = result[0].user_엉덩이;
                 b=6;
             }
-            if(a < result[0].User_허벅지) {
-                a = result[0].User_허벅지;
+            if(a < result[0].user_허벅지) {
+                a = result[0].user_허벅지;
                 b=7;
             }
-            if(a < result[0].User_전신) {
-                a = result[0].User_전신;
+            if(a < result[0].user_전신) {
+                a = result[0].user_전신;
                 b=8;
             }
             res.json({
@@ -804,47 +840,47 @@ app.post('/user/routine/RecommendExericse', function (req, res) {
 app.post('/user/routine/FavoriteExericse', function (req, res) {
     var a;
     var b;
-    var User_id = req.body.User_id;
-    var params = [User_id];
-    var sql = 'select User_어깨, User_팔, User_가슴, User_등, User_복부, User_코어, User_엉덩이, User_허벅지, User_전신 from User_routine where User_id = ?';
+    var user_id = req.body.user_id;
+    var params = [user_id];
+    var sql = 'select user_어깨, user_팔, user_가슴, user_등, user_복부, user_코어, user_엉덩이, user_허벅지, user_전신 from user_routine where user_id = ?';
     connection.query(sql,params, function (err,result) {
         if (err)
             console.log(err);
         else {
-            if(result[0].User_어깨 < result[0].User_팔) {
-                a = result[0].User_팔;
+            if(result[0].user_어깨 < result[0].user_팔) {
+                a = result[0].user_팔;
                 b=1;
             }
             else{
-                a = result[0].User_어깨;
+                a = result[0].user_어깨;
                 b=0;
             }
-            if(a < result[0].User_가슴) {
-                a = result[0].User_가슴;
+            if(a < result[0].user_가슴) {
+                a = result[0].user_가슴;
                 b=2;
             }
-            if(a < result[0].User_등) {
-                a = result[0].User_등;
+            if(a < result[0].user_등) {
+                a = result[0].user_등;
                 b=3;
             }
-            if(a < result[0].User_복부) {
-                a = result[0].User_복부;
+            if(a < result[0].user_복부) {
+                a = result[0].user_복부;
                 b=4;
             }
-            if(a < result[0].User_코어) {
-                a = result[0].User_코어;
+            if(a < result[0].user_코어) {
+                a = result[0].user_코어;
                 b=5;
             }
-            if(a < result[0].User_엉덩이) {
-                a = result[0].User_엉덩이;
+            if(a < result[0].user_엉덩이) {
+                a = result[0].user_엉덩이;
                 b=6;
             }
-            if(a < result[0].User_허벅지) {
-                a = result[0].User_허벅지;
+            if(a < result[0].user_허벅지) {
+                a = result[0].user_허벅지;
                 b=7;
             }
-            if(a < result[0].User_전신 ){
-                a = result[0].User_전신;
+            if(a < result[0].user_전신 ){
+                a = result[0].user_전신;
                 b=8;
             }
             res.json({
@@ -856,13 +892,13 @@ app.post('/user/routine/FavoriteExericse', function (req, res) {
 });
 
 app.post('/user/routine/Statistic', function (req, res) {
-    var User_id = req.body.User_id;
+    var user_id = req.body.user_id;
     var Month = req.body.Month;
     var a = new Object();
     var response = new Array();
     var xd = new Array();
     var jsonobj;
-    console.log(User_id);
+    console.log(user_id);
     console.log(Month);
     function go_py(prm1,prm2) {
         const spawn = require('child_process').spawn;
@@ -875,7 +911,7 @@ app.post('/user/routine/Statistic', function (req, res) {
         });
     }
 
-    go_py(User_id,Month);
+    go_py(user_id,Month);
 
     const fs = require('fs');
     function go_Json(){
@@ -891,7 +927,7 @@ app.post('/user/routine/Statistic', function (req, res) {
             const time_exercise_second = jsonobj.time_exercise_second;
             const time_exercise_freq = jsonobj.time_exercise_freq;
             const count_exercise_freq = jsonobj.count_exercise_freq;
-            
+
             a.data = time_exercise_name;
             response.push(a);
             a = new Object();
@@ -930,15 +966,15 @@ app.post('/user/routine/Statistic', function (req, res) {
 
 });
 
-app.post('/user/routine/Statistic/Excerise', function (req, res) {
-    var User_id = req.body.User_id;
-    var Exercise = req.body.Exercise;
+app.post('/user/routine/Statistic/exercise', function (req, res) {
+    var user_id = req.body.user_id;
+    var exercise = req.body.exercise;
     var Month = req.body.Month;
     var response = new Array();
     var a = new Object();
-    var params = [User_id,Exercise];
-    var sql = 'select Calendar_date, Calendar_title, Calendar_count, Calendar_minute, Calendar_second from Calendar where User_id = ? AND Calendar_title = ? AND Calendar_date like ';
-    sql+="'%" + Month + "%' ORDER BY Calendar_date ASC";
+    var params = [user_id,exercise];
+    var sql = 'select calendar_date, calendar_title, calendar_count, calendar_minute, calendar_second from Calendar where user_id = ? AND calendar_title = ? AND calendar_date like ';
+    sql+="'%" + Month + "%' ORDER BY calendar_date ASC";
     connection.query(sql,params, function (err,result) {
         if (err)
             console.log(err);
@@ -950,10 +986,10 @@ app.post('/user/routine/Statistic/Excerise', function (req, res) {
                 });
             } else {for ( i = 0 ; i < result.length ; i++) {
                     a = new Object();
-                    a.date = result[i].Calendar_date.substring(8,10);
-                    a.count = result[i].Calendar_count;
-                    a.min = result[i].Calendar_minute;
-                    a.second = result[i].Calendar_second;
+                    a.date = result[i].calendar_date.substring(8,10);
+                    a.count = result[i].calendar_count;
+                    a.min = result[i].calendar_minute;
+                    a.second = result[i].calendar_second;
                     response.push(a);
                 }
                 res.json({
@@ -968,91 +1004,91 @@ app.post('/user/routine/Statistic/Excerise', function (req, res) {
 });
 
 app.post('/user/routine/Statistic/Part', function (req, res) {
-    var User_id = req.body.User_id;
+    var user_id = req.body.user_id;
     var Part = req.body.Part;
     var Month = req.body.Month;
     var response = new Array();
     var a = new Object();
-    var params = [User_id,Month];
-    var sql = 'select Calendar_date, Calendar_title from Calendar where User_id = ? AND Calendar_date like ';
-    sql+="'%" + Month + "%' ORDER BY Calendar_date ASC";
+    var params = [user_id,Month];
+    var sql = 'select calendar_date, calendar_title from Calendar where user_id = ? AND calendar_date like ';
+    sql+="'%" + Month + "%' ORDER BY calendar_date ASC";
 
     connection.query(sql,params, function (err,result) {
         if (err)
             console.log(err);
         else {
-            if (result.length === 0) 
+            if (result.length === 0)
             {
                 res.json({
                     result: false,
                     message: '운동이 없습니다.'
                 });
-            } 
-            
+            }
+
             else
             {
-                for ( i = 0 ; i < result.length ; i++) 
+                for ( i = 0 ; i < result.length ; i++)
                 {
                     if(Part===("어깨")){
-                        if(result[i].Calendar_title===("숄더 프레스")||result[i].Calendar_title===("사이드 레터럴 레이즈")||result[i].Calendar_title===("벤트 오버 레터럴 레이즈")){
+                        if(result[i].calendar_title===("숄더 프레스")||result[i].calendar_title===("사이드 레터럴 레이즈")||result[i].calendar_title===("벤트 오버 레터럴 레이즈")){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="팔"){
-                        if(result[i].Calendar_title==="덤벨 컬"||result[i].Calendar_title==="컨센트레이션 컬"||result[i].Calendar_title==="벤치 딥"){
+                        if(result[i].calendar_title==="덤벨 컬"||result[i].calendar_title==="컨센트레이션 컬"||result[i].calendar_title==="벤치 딥"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="가슴"){
-                        if(result[i].Calendar_title==="푸쉬 업"||result[i].Calendar_title==="다이아몬드 푸쉬업"){
+                        if(result[i].calendar_title==="푸쉬 업"||result[i].calendar_title==="다이아몬드 푸쉬업"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="등"){
-                        if(result[i].Calendar_title==="랫 풀 다운"||result[i].Calendar_title==="풀 업"||result[i].Calendar_title==="친 업"){
+                        if(result[i].calendar_title==="랫 풀 다운"||result[i].calendar_title==="풀 업"||result[i].calendar_title==="친 업"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="복부"){
-                        if(result[i].Calendar_title==="크런치"||result[i].Calendar_title==="니 업"||result[i].Calendar_title==="레그 레이즈"||result[i].Calendar_title==="윗몸 일으키기"){
+                        if(result[i].calendar_title==="크런치"||result[i].calendar_title==="니 업"||result[i].calendar_title==="레그 레이즈"||result[i].calendar_title==="윗몸 일으키기"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="코어"){
-                        if(result[i].Calendar_title==="버드 독"||result[i].Calendar_title==="플랭크"||result[i].Calendar_title==="힙 브릿지"||result[i].Calendar_title==="런지"){
+                        if(result[i].calendar_title==="버드 독"||result[i].calendar_title==="플랭크"||result[i].calendar_title==="힙 브릿지"||result[i].calendar_title==="런지"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="엉덩이"){
-                        if(result[i].Calendar_title==="힐 킥"||result[i].Calendar_title==="케틀벨 스윙"){
+                        if(result[i].calendar_title==="힐 킥"||result[i].calendar_title==="케틀벨 스윙"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="허벅지"){
-                        if(result[i].Calendar_title==="스쿼트"||result[i].Calendar_title==="홈사이클"){
+                        if(result[i].calendar_title==="스쿼트"||result[i].calendar_title==="홈사이클"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
                     else if(Part==="전신"){
-                        if(result[i].Calendar_title==="팔벌려뛰기"||result[i].Calendar_title==="버피테스트"||result[i].Calendar_title==="러닝"){
+                        if(result[i].calendar_title==="팔벌려뛰기"||result[i].calendar_title==="버피테스트"||result[i].calendar_title==="러닝"){
                         a = new Object();
-                        a.date= result[i].Calendar_date.substring(8,10);
+                        a.date= result[i].calendar_date.substring(8,10);
                         response.push(a);
                         }
                     }
